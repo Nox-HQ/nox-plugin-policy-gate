@@ -1,0 +1,33 @@
+# Insecure deployment pipeline -- testdata for nox-plugin-policy-gate.
+# This file intentionally contains policy violations.
+
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: make build
+
+  deploy-to-prod:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy Production
+        run: |
+          docker build -t myapp:latest .
+          docker push myapp:latest
+        env:
+          DEPLOY_TOKEN: "hardcoded-secret-value-12345"
+          password: "my-super-secret-password"
+      - name: Run deployment
+        uses: some-org/deploy-action@main
+        with:
+          target: production

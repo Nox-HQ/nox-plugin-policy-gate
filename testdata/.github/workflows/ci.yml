@@ -1,0 +1,18 @@
+# Minimal CI pipeline -- testdata for nox-plugin-policy-gate.
+# This file intentionally lacks security scanning and dependency audit.
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tests
+        run: make test
+      - name: Lint
+        run: make lint
