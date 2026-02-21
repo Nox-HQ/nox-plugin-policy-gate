@@ -1,4 +1,4 @@
-# Insecure deployment pipeline -- testdata for nox-plugin-policy-gate.
+# Insecure deployment pipeline -- testdata for policy scanner.
 # This file intentionally contains policy violations.
 
 name: Deploy to Production

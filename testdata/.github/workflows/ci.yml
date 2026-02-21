@@ -1,4 +1,4 @@
-# Minimal CI pipeline -- testdata for nox-plugin-policy-gate.
+# Minimal CI pipeline -- testdata for policy scanner.
 # This file intentionally lacks security scanning and dependency audit.
 
 name: CI

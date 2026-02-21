@@ -135,7 +135,7 @@ func discoverCIFiles(root string) []discoveredFile {
 }
 
 // scanCIFile runs all policy rules against a single CI configuration file.
-func scanCIFile(resp *sdk.ResponseBuilder, filePath string, ciType string) {
+func scanCIFile(resp *sdk.ResponseBuilder, filePath, ciType string) {
 	lines, err := readLines(filePath)
 	if err != nil {
 		return
@@ -156,7 +156,7 @@ func readLines(filePath string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	var lines []string
 	scanner := bufio.NewScanner(f)
@@ -167,7 +167,7 @@ func readLines(filePath string) ([]string, error) {
 }
 
 // checkBranchProtection checks for POLICY-001: missing branch protection configuration.
-func checkBranchProtection(resp *sdk.ResponseBuilder, filePath string, content string, ciType string) {
+func checkBranchProtection(resp *sdk.ResponseBuilder, filePath, content, ciType string) {
 	if reRequiredReviewers.MatchString(content) {
 		return
 	}
@@ -185,7 +185,7 @@ func checkBranchProtection(resp *sdk.ResponseBuilder, filePath string, content s
 }
 
 // checkSecurityScanning checks for POLICY-002: missing security scanning step.
-func checkSecurityScanning(resp *sdk.ResponseBuilder, filePath string, content string, ciType string) {
+func checkSecurityScanning(resp *sdk.ResponseBuilder, filePath, content, ciType string) {
 	hasSAST := reSASTStep.MatchString(content)
 	hasDAST := reDASTStep.MatchString(content)
 	hasSecrets := reSecretsStep.MatchString(content)
@@ -207,7 +207,7 @@ func checkSecurityScanning(resp *sdk.ResponseBuilder, filePath string, content s
 }
 
 // checkDeploymentApproval checks for POLICY-003: deployment without approval gate.
-func checkDeploymentApproval(resp *sdk.ResponseBuilder, filePath string, lines []string, content string, ciType string) {
+func checkDeploymentApproval(resp *sdk.ResponseBuilder, filePath string, lines []string, content, ciType string) {
 	hasDeployProd := reDeployProd.MatchString(content)
 	if !hasDeployProd {
 		return
@@ -242,7 +242,7 @@ func checkDeploymentApproval(resp *sdk.ResponseBuilder, filePath string, lines [
 }
 
 // checkDependencyAudit checks for POLICY-004: missing dependency audit step.
-func checkDependencyAudit(resp *sdk.ResponseBuilder, filePath string, content string, ciType string) {
+func checkDependencyAudit(resp *sdk.ResponseBuilder, filePath, content, ciType string) {
 	if reDepAudit.MatchString(content) {
 		return
 	}
@@ -318,12 +318,17 @@ func checkInsecurePractices(resp *sdk.ResponseBuilder, filePath string, lines []
 }
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 
 	srv := buildServer()
 	if err := srv.Serve(ctx); err != nil {
 		fmt.Fprintf(os.Stderr, "nox-plugin-policy-gate: %v\n", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }

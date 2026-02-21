@@ -76,14 +76,12 @@ func TestScanFindsInsecurePractices(t *testing.T) {
 	// Verify we detect both hardcoded secrets and unpinned actions.
 	var hasHardcoded, hasUnpinned bool
 	for _, f := range found {
-		for _, md := range f.GetMetadata() {
-			if md.GetKey() == "practice" {
-				switch md.GetValue() {
-				case "hardcoded_secret":
-					hasHardcoded = true
-				case "unpinned_action":
-					hasUnpinned = true
-				}
+		if v, ok := f.GetMetadata()["practice"]; ok {
+			switch v {
+			case "hardcoded_secret":
+				hasHardcoded = true
+			case "unpinned_action":
+				hasUnpinned = true
 			}
 		}
 	}
@@ -153,7 +151,7 @@ func testClient(t *testing.T) pluginv1.PluginServiceClient {
 	if err != nil {
 		t.Fatalf("grpc.NewClient: %v", err)
 	}
-	t.Cleanup(func() { conn.Close() })
+	t.Cleanup(func() { _ = conn.Close() })
 
 	return pluginv1.NewPluginServiceClient(conn)
 }
