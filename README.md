@@ -1,3 +1,6 @@
+> [!WARNING]
+> **Deprecated.** Policy gating is built into nox core — use `policy.fail_on` / `policy.warn_on` in `.nox.yaml`, the `--severity-threshold` / `--min-confidence` flags, and `--vex … --fail-on-unwaived`. This plugin is no longer developed; existing installs keep working.
+
 # nox-plugin-policy-gate
 
 **CI policy gate enforcement for secure pipelines.**
