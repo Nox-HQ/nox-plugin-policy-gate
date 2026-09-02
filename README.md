@@ -1,3 +1,21 @@
+> ## ⚠️ Archived — superseded by nox core
+>
+> **This plugin is retired. Do not install it.** Remove it with
+> `nox plugin remove nox/policy-gate`.
+>
+> Gating a build on scan results is core behaviour and needs no plugin. The
+> replacements, all built in:
+>
+> - `policy.fail_on` in `.nox.yaml` — fail on severities you choose
+> - `--severity-threshold` — the same decision as a one-off flag
+> - `--fail-on-unwaived` — fail only on what nobody has waived
+> - `--fail-on-degraded` — fail when a check could not complete, so a gate
+>   cannot pass because an analyzer silently did not run
+>
+> Core also gates on what a scan actually established rather than on what the
+> build could have established, via `policy.uncertainty` and
+> `policy.require_capabilities`.
+
 > [!WARNING]
 > **Deprecated.** Policy gating is built into nox core — use `policy.fail_on` / `policy.warn_on` in `.nox.yaml`, the `--severity-threshold` / `--min-confidence` flags, and `--vex … --fail-on-unwaived`. This plugin is no longer developed; existing installs keep working.
 
